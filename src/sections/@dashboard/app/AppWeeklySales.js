@@ -5,6 +5,7 @@ import { Card, Typography } from '@mui/material';
 import { fShortenNumber } from '../../../utils/formatNumber';
 // component
 import Iconify from '../../../components/Iconify';
+import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
 
 // ----------------------------------------------------------------------
 
@@ -36,15 +37,16 @@ const IconWrapperStyle = styled('div')(({ theme }) => ({
 
 const TOTAL = 714000;
 
-export default function AppWeeklySales() {
+export default function AppWeeklySales(props) {
   return (
     <RootStyle>
       <IconWrapperStyle>
-        <Iconify icon="ant-design:android-filled" width={24} height={24} />
+        {/* <Iconify icon="ant-design:android-filled" width={24} height={24} /> */}
+        <BrandingWatermarkIcon />
       </IconWrapperStyle>
-      <Typography variant="h3">{fShortenNumber(TOTAL)}</Typography>
+      <Typography variant="h3">{props.data}</Typography>
       <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
-        Weekly Sales
+        Total Products
       </Typography>
     </RootStyle>
   );

@@ -5,6 +5,7 @@ import { Card, Typography } from '@mui/material';
 import { fShortenNumber } from '../../../utils/formatNumber';
 //
 import Iconify from '../../../components/Iconify';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
 // ----------------------------------------------------------------------
 
@@ -36,15 +37,15 @@ const IconWrapperStyle = styled('div')(({ theme }) => ({
 
 const TOTAL = 1723315;
 
-export default function AppItemOrders() {
+export default function AppItemOrders(props) {
   return (
     <RootStyle>
       <IconWrapperStyle>
-        <Iconify icon="ant-design:windows-filled" width={24} height={24} />
+        <PersonOutlineIcon />
       </IconWrapperStyle>
-      <Typography variant="h3">{fShortenNumber(TOTAL)}</Typography>
+      <Typography variant="h3">{props.data ? props.data : 0}</Typography>
       <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
-        Item Orders
+        User
       </Typography>
     </RootStyle>
   );

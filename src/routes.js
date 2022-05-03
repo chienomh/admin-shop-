@@ -11,6 +11,8 @@ import Blog from './pages/Blog';
 import User from './pages/User';
 import NotFound from './pages/Page404';
 import ChangePassword from './pages/changePassword';
+import Bill from './pages/BillPage';
+import DetailProduct from './sections/@dashboard/products/detailProduct';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +27,8 @@ export default function Router() {
         { path: 'user', element: <User /> },
         { path: 'products', element: <Products /> },
         { path: 'blog', element: <Blog /> },
+        { path: 'bill', element: <Bill /> },
+        { path: 'products/:id', element: <DetailProduct /> },
       ],
     },
     {
@@ -36,6 +40,7 @@ export default function Router() {
         { path: 'register', element: <Register /> },
         { path: 'change-password', element: <ChangePassword /> },
         { path: '404', element: <NotFound /> },
+        { path: 'products/:id', element: <DetailProduct /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
     },

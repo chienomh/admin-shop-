@@ -1,12 +1,10 @@
-import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
 import { useEffect, useState } from 'react';
 // material
 import {
-  Avatar,
   Card,
-  Checkbox,
   Container,
+  MenuItem,
   Stack,
   Table,
   TableBody,
@@ -14,32 +12,56 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
 // components
-import Label from '../components/Label';
-import Page from '../components/Page';
-import Scrollbar from '../components/Scrollbar';
-import SearchNotFound from '../components/SearchNotFound';
-import {
-  UserListHead,
-  UserListToolbar,
-  UserMoreMenu,
-} from '../sections/@dashboard/user';
+import USERLIST from '../../_mocks_/user';
 //
-import USERLIST from '../_mocks_/user';
-import { getListUser } from 'src/services/userAPI';
+import Page from 'src/components/Page';
+import Scrollbar from 'src/components/Scrollbar';
+import SearchNotFound from 'src/components/SearchNotFound';
+import { UserListHead, UserListToolbar } from 'src/sections/@dashboard/user';
+import { getListBill } from 'src/services/bill';
+import Label from 'src/components/Label';
+import moment from 'moment';
+import PopupBill from './PopupBill';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'email', label: 'Email', alignRight: false },
-  { id: 'address', label: 'Address', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
+  { id: 'date', label: 'Date', alignRight: false },
+  { id: 'coupon', label: 'Coupon', alignRight: false },
+  { id: 'price', label: 'Price', alignRight: false },
+  { id: 'percent', label: 'Discount percent', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
+  // { id: 'action', label: 'Action', alignRight: false },
   { id: '' },
+];
+
+const valuesStatus = [
+  {
+    value: 0,
+    label: 'Unprocessed',
+  },
+  {
+    value: 1,
+    label: 'Processed',
+  },
+  {
+    value: 2,
+    label: 'Delivering',
+  },
+  {
+    value: 3,
+    label: 'delivered',
+  },
+  {
+    value: 4,
+    label: 'Cannceled',
+  },
 ];
 
 // ----------------------------------------------------------------------
@@ -70,35 +92,30 @@ function applySortFilter(array, comparator, query) {
   if (query) {
     return filter(
       array,
-      _user => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
+      _user => _user.userName.toLowerCase().indexOf(query.toLowerCase()) !== -1,
     );
   }
   return stabilizedThis.map(el => el[0]);
 }
 
-export default function User() {
+export default function Bill() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [isOpenPopup, setIsOpenPopup] = useState(false);
+  const [idBill, setIdBill] = useState(0);
 
-  const [listUser, setListUser] = useState([]);
+  // const [action, setAction] = useState(0);
+
+  const [listBill, setListBill] = useState([]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
-
-  const handleSelectAllClick = event => {
-    if (event.target.checked) {
-      const newSelecteds = USERLIST.map(n => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -118,7 +135,7 @@ export default function User() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
   const filteredUsers = applySortFilter(
-    listUser,
+    listBill,
     getComparator(order, orderBy),
     filterName,
   );
@@ -126,17 +143,26 @@ export default function User() {
   useEffect(() => {
     (async () => {
       const param = {};
-      const data = await getListUser(param);
+      const data = await getListBill();
 
       console.log(data.data.rows);
-      setListUser(data.data.rows);
+      setListBill(data.data.rows);
     })();
-  }, []);
+  }, [isOpenPopup]);
 
   const isUserNotFound = filteredUsers.length === 0;
 
+  const handleClickRow = id => {
+    setIdBill(id);
+    setIsOpenPopup(true);
+  };
+
+  const onClosePopup = () => {
+    setIsOpenPopup(false);
+  };
   return (
-    <Page title="User">
+    <Page title="Bill">
+      <PopupBill open={isOpenPopup} handleClose={onClosePopup} id={idBill} />
       <Container>
         <Stack
           direction="row"
@@ -145,7 +171,7 @@ export default function User() {
           mb={5}
         >
           <Typography variant="h4" gutterBottom>
-            Customer
+            Bill
           </Typography>
         </Stack>
 
@@ -163,7 +189,7 @@ export default function User() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={listUser.length}
+                  rowCount={listBill.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                 />
@@ -171,9 +197,48 @@ export default function User() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map(row => {
-                      const { id, name, address, enabled, age, email, roles } =
-                        row;
-                      const isItemSelected = selected.indexOf(name) !== -1;
+                      const {
+                        id,
+                        userName,
+                        buyDate,
+                        couponName,
+                        discountPercent,
+                        priceTotal,
+                        status,
+                      } = row;
+                      const isItemSelected = selected.indexOf(userName) !== -1;
+
+                      let colorStatus = valuesStatus.filter(
+                        x => x.value === status,
+                      )[0].value;
+
+                      let color;
+                      switch (colorStatus) {
+                        case 0: {
+                          color = 'default';
+                          break;
+                        }
+                        case 1: {
+                          color = 'primary';
+                          break;
+                        }
+                        case 2: {
+                          color = 'secondary';
+                          break;
+                        }
+                        case 3: {
+                          color = 'success';
+                          break;
+                        }
+                        case 4: {
+                          color = 'error';
+                          break;
+                        }
+                        default: {
+                          color = 'default';
+                          break;
+                        }
+                      }
                       return (
                         <TableRow
                           hover
@@ -182,6 +247,8 @@ export default function User() {
                           role="checkbox"
                           selected={isItemSelected}
                           aria-checked={isItemSelected}
+                          onClick={() => handleClickRow(id)}
+                          sx={{ cursor: 'poiter' }}
                         >
                           <TableCell align="left">{id}</TableCell>
                           <TableCell component="th" scope="row" padding="none">
@@ -192,27 +259,34 @@ export default function User() {
                             >
                               {/* <Avatar alt={name} src={avatarUrl} /> */}
                               <Typography variant="subtitle2" noWrap>
-                                {name}
+                                {userName}
                               </Typography>
                             </Stack>
                           </TableCell>
-                          <TableCell align="left">{email}</TableCell>
-                          <TableCell align="left">{address}</TableCell>
-                          <TableCell align="left">
-                            {roles[0] === 'ROLE_ADMIN' ? 'Admin' : 'User'}
+                          <TableCell align="center">
+                            {moment(buyDate).format('DD/MM/YYYY')}
                           </TableCell>
-                          <TableCell align="left">
-                            <Label
-                              variant="ghost"
-                              color={enabled ? 'success' : 'error'}
-                            >
-                              {sentenceCase(enabled ? 'Open' : 'Block')}
+                          <TableCell align="left">{couponName}</TableCell>
+                          <TableCell align="left">{priceTotal} $</TableCell>
+                          <TableCell align="right">{discountPercent}</TableCell>
+                          <TableCell align="center">
+                            <Label variant="ghost" color={color}>
+                              {
+                                valuesStatus.filter(x => x.value === status)[0]
+                                  .label
+                              }
                             </Label>
                           </TableCell>
 
-                          <TableCell align="right">
-                            <UserMoreMenu enabled={enabled} id={id} />
-                          </TableCell>
+                          {/* <TableCell align="right">
+                            <TextField select value={status}>
+                              {valuesStatus.map(x => (
+                                <MenuItem key={x.value} value={x.value}>
+                                  {x.label}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          </TableCell> */}
                         </TableRow>
                       );
                     })}

@@ -175,7 +175,7 @@ export default function EcommerceShop() {
   }, []);
   //---------------------------------------------------
   return (
-    <Page title="Dashboard: Products | Minimal-UI">
+    <Page title="Dashboard: Products">
       <AlertShop
         isOpen={openAlertAdd}
         textAlert="Add product successfully!"

@@ -50,7 +50,8 @@ export default function LoginForm() {
           'access_token',
           data.data.accessToken,
         );
-        dispatch(login());
+        dispatch(login(data.data.userId));
+        localStorage.setItem('userId', data.data.userId);
         navigate('/dashboard/app', { replace: true });
       } catch (error) {}
     },

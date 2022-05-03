@@ -21,6 +21,11 @@ const sidebarConfig = [
     path: '/dashboard/products',
     icon: getIcon('eva:shopping-bag-fill'),
   },
+  {
+    title: 'bill',
+    path: '/dashboard/bill',
+    icon: getIcon('eva:pie-chart-2-fill'),
+  },
 ];
 
 export default sidebarConfig;

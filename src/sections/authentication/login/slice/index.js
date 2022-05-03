@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { useNavigate } from 'react-router-dom';
-import { getInforAPI } from 'src/services/loginAPI';
+import { getDetailUser, getInforAPI } from 'src/services/loginAPI';
 
 // Slice
 export const slice = createSlice({
@@ -29,9 +29,11 @@ export const slice = createSlice({
 export default slice.reducer;
 
 const { loginSuccess } = slice.actions;
-export const login = () => async dispatch => {
+export const login = action => async dispatch => {
+  console.log(action);
   try {
-    const res = await getInforAPI();
+    const userId = localStorage.getItem('userId');
+    const res = await getDetailUser(userId);
     dispatch(loginSuccess(res.data));
   } catch (e) {
     localStorage.setItem('access_token', '');
