@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // material
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -93,6 +93,8 @@ ShopProductCard.propTypes = {
 };
 
 export default function ShopProductCard({ product }) {
+  const navigate = useNavigate();
+
   const { name, image, price, id, description, manufacturer } = product;
   const [openPopup, setOpenPopup] = useState(false);
   const [openPopupMessage, setOpenPopupMessage] = useState(false);
@@ -147,7 +149,6 @@ export default function ShopProductCard({ product }) {
     setGender(e.target.value);
   };
 
-  console.log(listSize);
   const formik = useFormik({
     initialValues: {},
     validationSchema: schema,
@@ -227,6 +228,10 @@ export default function ShopProductCard({ product }) {
     await deleteProduct(id);
     setIsOpenAlertDelete(true);
   };
+
+  const goDetail = () => {
+    navigate(`/product/${id}`, { replace: true });
+  };
   return (
     <Box>
       <AlertShop
@@ -249,6 +254,7 @@ export default function ShopProductCard({ product }) {
           transition: '0.25s',
           cursor: 'pointer',
         }}
+        // onClick={goDetail}
       >
         <Box sx={{ pt: '100%', position: 'relative' }}>
           <ProductImgStyle alt={name} src={image} />

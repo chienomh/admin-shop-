@@ -24,7 +24,7 @@ const SORT_OPTIONS = [
 
 export default function Blog() {
   return (
-    <Page title="Dashboard: Blog | Minimal-UI">
+    <Page title="Dashboard: Blog">
       <Container>
         <Stack
           direction="row"
