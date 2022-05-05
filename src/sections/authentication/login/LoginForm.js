@@ -15,16 +15,20 @@ import {
 import { LoadingButton } from '@mui/lab';
 // component
 import Iconify from '../../../components/Iconify';
-import { getInforAPI, getTokenAPI } from 'src/services/loginAPI';
+import { getDetailUser, getInforAPI, getTokenAPI } from 'src/services/loginAPI';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { login } from './slice/index';
+import { Box } from '@mui/system';
+import AlertShop from 'src/components/Alert';
 
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [type, setType] = useState(false);
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required'),
@@ -50,10 +54,16 @@ export default function LoginForm() {
           'access_token',
           data.data.accessToken,
         );
-        dispatch(login(data.data.userId));
         localStorage.setItem('userId', data.data.userId);
+        dispatch(login(data.data.userId));
+        const id = JSON.parse(localStorage.getItem('userId') || '');
+        await getDetailUser(id);
         navigate('/dashboard/app', { replace: true });
-      } catch (error) {}
+        setType(true);
+      } catch (error) {
+        setOpenAlert(true);
+        setType(false);
+      }
     },
   });
 
@@ -66,8 +76,16 @@ export default function LoginForm() {
 
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.user);
+
   return (
     <FormikProvider value={formik}>
+      <AlertShop
+        isOpen={openAlert}
+        type="error"
+        textAlert="Ops! Something went wrong!"
+        handle={() => setOpenAlert(false)}
+        onClose={() => setOpenAlert(false)}
+      />
       <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
         <Stack spacing={3}>
           <TextField

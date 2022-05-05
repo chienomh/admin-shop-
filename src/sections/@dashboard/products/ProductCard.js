@@ -110,6 +110,7 @@ export default function ShopProductCard({ product }) {
   const [listProduct, setListProduct] = useState();
   const [isLoadingImg, setIsLoadingImg] = useState(false);
   const [isOpenAlertDelete, setIsOpenAlertDelete] = useState(false);
+  const [typeDelete, setTypeDelete] = useState(false);
 
   const handleClosePopup = () => {
     setOpenPopup(false);
@@ -149,6 +150,8 @@ export default function ShopProductCard({ product }) {
     setGender(e.target.value);
   };
 
+  console.log(listSize);
+
   const formik = useFormik({
     initialValues: {},
     validationSchema: schema,
@@ -160,9 +163,10 @@ export default function ShopProductCard({ product }) {
         gender: gender,
         image: linkImg,
         listSize: listSize.map(x => ({
-          quantity: x.quantity,
+          quantity: Number(x.quantity),
           name: x.name,
-          id,
+          productId: id,
+          id: x.id,
         })),
         manufacturer: getFieldProps('facturer').value,
         material: metarial,
@@ -225,12 +229,20 @@ export default function ShopProductCard({ product }) {
   };
 
   const handleDeleteProduct = async () => {
-    await deleteProduct(id);
-    setIsOpenAlertDelete(true);
+    try {
+      await deleteProduct(id);
+      setIsOpenAlertDelete(true);
+      setTypeDelete(true);
+    } catch (error) {
+      setIsOpenAlertDelete(true);
+      setTypeDelete(false);
+    }
   };
 
   const goDetail = () => {
-    navigate(`/product/${id}`, { replace: true });
+    navigate(`/dashboard/products/${id}`, {
+      state: { id: id, name: 'id' },
+    });
   };
   return (
     <Box>
@@ -242,11 +254,15 @@ export default function ShopProductCard({ product }) {
         handle={() => window.location.reload()}
       />
       <AlertShop
-        type="success"
+        type={typeDelete ? 'success' : 'error'}
         isOpen={isOpenAlertDelete}
-        textAlert="Delete product successfully!"
+        textAlert={
+          typeDelete
+            ? 'Delete product successfully!'
+            : 'Ops! Product is currently being purchased!'
+        }
         onClose={() => setIsOpenAlertDelete(false)}
-        handle={() => window.location.reload()}
+        handle={() => (typeDelete ? window.location.reload() : '')}
       />
       <Card
         sx={{
@@ -254,10 +270,9 @@ export default function ShopProductCard({ product }) {
           transition: '0.25s',
           cursor: 'pointer',
         }}
-        // onClick={goDetail}
       >
         <Box sx={{ pt: '100%', position: 'relative' }}>
-          <ProductImgStyle alt={name} src={image} />
+          <ProductImgStyle alt={name} src={image} onClick={goDetail} />
         </Box>
 
         <Stack spacing={2} sx={{ p: 3 }}>

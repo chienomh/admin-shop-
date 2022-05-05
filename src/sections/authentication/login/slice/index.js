@@ -18,27 +18,35 @@ export const slice = createSlice({
       phone: '',
       roles: [],
     },
+    typeMess: true,
   },
   reducers: {
     loginSuccess: (state, action) => {
       state.data = action.payload;
+      state.typeMess = true;
+    },
+
+    loginFail: state => {
+      state.typeMess = false;
     },
   },
 });
 
 export default slice.reducer;
 
-const { loginSuccess } = slice.actions;
+const { loginSuccess, loginFail } = slice.actions;
 export const login = action => async dispatch => {
-  console.log(action);
   try {
     const userId = localStorage.getItem('userId');
     const res = await getDetailUser(userId);
     dispatch(loginSuccess(res.data));
+    localStorage.setItem('dataUser', JSON.stringify(res.data));
   } catch (e) {
+    localStorage.setItem('dataUser', '');
     localStorage.setItem('access_token', '');
     const navigate = useNavigate();
     navigate('/login', { replace: true });
+    dispatch(loginFail());
     return console.error(e.message);
   }
 };

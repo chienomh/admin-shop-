@@ -16,3 +16,6 @@ export const updateProduct = params =>
 
 export const deleteProduct = params =>
   apiClient.get(`/admin/product/delete?id=${params}`);
+
+export const getListReview = param =>
+  apiClient.get(`/review/list?productId=${param}`);

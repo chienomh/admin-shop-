@@ -29,7 +29,7 @@ const MENU_OPTIONS = [
   {
     label: 'Profile',
     icon: 'eva:person-fill',
-    linkTo: '#',
+    linkTo: '/profile',
   },
   {
     label: 'Change Password',
@@ -42,8 +42,10 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const navigate = useNavigate();
-  const user = useSelector(state => state.user).data;
+  // const user = useSelector(state => state.user).data;
   const data = useSelector(state => state);
+
+  const user = JSON.parse(localStorage.getItem('dataUser') || '');
 
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);

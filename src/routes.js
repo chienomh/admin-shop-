@@ -13,6 +13,9 @@ import NotFound from './pages/Page404';
 import ChangePassword from './pages/changePassword';
 import Bill from './pages/BillPage';
 import DetailProduct from './sections/@dashboard/products/detailProduct';
+import Profile from './pages/Profile/profile';
+import Coupon from './pages/Coupon';
+import MessagePage from './pages/Message';
 
 // ----------------------------------------------------------------------
 
@@ -29,6 +32,9 @@ export default function Router() {
         { path: 'blog', element: <Blog /> },
         { path: 'bill', element: <Bill /> },
         { path: 'products/:id', element: <DetailProduct /> },
+        { path: 'profile', element: <Profile /> },
+        { path: 'coupon', element: <Coupon /> },
+        { path: 'message', element: <MessagePage /> },
       ],
     },
     {
@@ -38,9 +44,10 @@ export default function Router() {
         { path: '/', element: <Navigate to="/dashboard/app" /> },
         { path: 'login', element: <Login /> },
         { path: 'register', element: <Register /> },
+        { path: 'profile', element: <Profile /> },
         { path: 'change-password', element: <ChangePassword /> },
         { path: '404', element: <NotFound /> },
-        { path: 'products/:id', element: <DetailProduct /> },
+        // { path: '/products/:id', element: <DetailProduct /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
     },

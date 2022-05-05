@@ -104,7 +104,7 @@ export default function EcommerceShop() {
         description: getFieldProps('description').value,
         gender: gender,
         image: linkImg,
-        listSize: listSize.map(x => ({ quantity: x.quantity, name: x.size })),
+        listSize: listSize.map(x => ({ quantity: x.quantity, name: x.name })),
         manufacturer: getFieldProps('facturer').value,
         material: metarial,
         name: getFieldProps('name').value,
