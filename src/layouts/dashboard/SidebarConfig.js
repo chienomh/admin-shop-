@@ -24,7 +24,17 @@ const sidebarConfig = [
   {
     title: 'bill',
     path: '/dashboard/bill',
-    icon: getIcon('eva:pie-chart-2-fill'),
+    icon: getIcon('clarity:dollar-bill-line'),
+  },
+  {
+    title: 'coupon',
+    path: '/dashboard/coupon',
+    icon: getIcon('bxs:coupon'),
+  },
+  {
+    title: 'message',
+    path: '/dashboard/message',
+    icon: getIcon('carbon:email'),
   },
 ];
 

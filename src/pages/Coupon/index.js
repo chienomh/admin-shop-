@@ -1,11 +1,9 @@
-import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
 import { useEffect, useState } from 'react';
 // material
 import {
-  Avatar,
+  Button,
   Card,
-  Checkbox,
   Container,
   Stack,
   Table,
@@ -17,28 +15,29 @@ import {
   Typography,
 } from '@mui/material';
 // components
-import Label from '../components/Label';
-import Page from '../components/Page';
-import Scrollbar from '../components/Scrollbar';
-import SearchNotFound from '../components/SearchNotFound';
-import {
-  UserListHead,
-  UserListToolbar,
-  UserMoreMenu,
-} from '../sections/@dashboard/user';
+import USERLIST from '../../_mocks_/user';
 //
-import USERLIST from '../_mocks_/user';
-import { getListUser } from 'src/services/userAPI';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Box } from '@mui/system';
+import Page from 'src/components/Page';
+import Scrollbar from 'src/components/Scrollbar';
+import SearchNotFound from 'src/components/SearchNotFound';
+import { UserListHead, UserListToolbar } from 'src/sections/@dashboard/user';
+import { deleteCoupon, getListCoupon } from 'src/services/coupon';
+import PopupAdd from './PopupAdd';
+import EditIcon from '@mui/icons-material/Edit';
+import AlertShop from 'src/components/Alert';
+import EditCoupon from './EditCoupon';
+// import PopupBill from './PopupBill';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'id', label: 'Id', alignRight: false },
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'email', label: 'Email', alignRight: false },
-  { id: 'address', label: 'Address', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'code', label: 'code', alignRight: false },
+  { id: 'percent', label: 'Percent', alignRight: false },
+  { id: 'action', label: 'Action', alignRight: false },
   { id: '' },
 ];
 
@@ -76,29 +75,29 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map(el => el[0]);
 }
 
-export default function User() {
+export default function Coupon() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [isOpenPopup, setIsOpenPopup] = useState(false);
+  const [idBill, setIdBill] = useState(0);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [type, setType] = useState(false);
+  const [isOpenPopupEdit, setIsOpenPopupEdit] = useState(false);
+  const [idC, setIdC] = useState('');
+  const [detailCoupon, setDetailCoupon] = useState('');
 
-  const [listUser, setListUser] = useState([]);
+  // const [action, setAction] = useState(0);
+
+  const [listBill, setListBill] = useState([]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
-
-  const handleSelectAllClick = event => {
-    if (event.target.checked) {
-      const newSelecteds = USERLIST.map(n => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -118,7 +117,7 @@ export default function User() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
   const filteredUsers = applySortFilter(
-    listUser,
+    listBill,
     getComparator(order, orderBy),
     filterName,
   );
@@ -126,17 +125,59 @@ export default function User() {
   useEffect(() => {
     (async () => {
       const param = {};
-      const data = await getListUser(param);
+      const data = await getListCoupon();
 
       console.log(data.data.rows);
-      setListUser(data.data.rows);
+      setListBill(data.data.rows);
     })();
-  }, []);
+  }, [openAlert, isOpenPopupEdit, isOpenPopup]);
 
   const isUserNotFound = filteredUsers.length === 0;
 
+  const onClosePopup = () => {
+    setIsOpenPopup(false);
+  };
+
+  const onClosePopupEdit = () => {
+    setIsOpenPopupEdit(false);
+  };
+
+  const handlDelete = async id => {
+    try {
+      await deleteCoupon(id);
+      setOpenAlert(true);
+      setType(true);
+    } catch (error) {
+      setOpenAlert(true);
+      setType(false);
+    }
+  };
+
+  const handleEdit = id => {
+    setIsOpenPopupEdit(true);
+    setIdC(id);
+    const coupon = listBill.filter(x => x.id === id)[0];
+    setDetailCoupon(coupon);
+  };
   return (
-    <Page title="User">
+    <Page title="Bill">
+      <AlertShop
+        isOpen={openAlert}
+        type={type ? 'success' : 'error'}
+        textAlert={
+          type ? 'Delete coupon Successfully!' : 'Delete coupon Faild!'
+        }
+        handle={() => {
+          setOpenAlert(false);
+        }}
+        onClose={() => setOpenAlert(false)}
+      />
+      <PopupAdd open={isOpenPopup} handlClose={onClosePopup} />
+      <EditCoupon
+        open={isOpenPopupEdit}
+        handlClose={onClosePopupEdit}
+        data={detailCoupon}
+      />
       <Container>
         <Stack
           direction="row"
@@ -145,10 +186,18 @@ export default function User() {
           mb={5}
         >
           <Typography variant="h4" gutterBottom>
-            Customer
+            Coupon
           </Typography>
         </Stack>
-
+        <Box textAlign="right">
+          <Button
+            variant="contained"
+            sx={{ marginBottom: '20px' }}
+            onClick={() => setIsOpenPopup(true)}
+          >
+            Add Coupon
+          </Button>
+        </Box>
         <Card>
           <UserListToolbar
             numSelected={selected.length}
@@ -163,7 +212,7 @@ export default function User() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={listUser.length}
+                  rowCount={listBill.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                 />
@@ -171,9 +220,9 @@ export default function User() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map(row => {
-                      const { id, name, address, enabled, age, email, roles } =
-                        row;
+                      const { id, name, code, percent } = row;
                       const isItemSelected = selected.indexOf(name) !== -1;
+
                       return (
                         <TableRow
                           hover
@@ -182,49 +231,36 @@ export default function User() {
                           role="checkbox"
                           selected={isItemSelected}
                           aria-checked={isItemSelected}
+                          //   onClick={() => handleClickRow(id)}
+                          sx={{ cursor: 'poiter' }}
                         >
-                          <TableCell align="left">{id}</TableCell>
-                          <TableCell component="th" scope="row" padding="none">
-                            <Stack
-                              direction="row"
-                              alignItems="center"
-                              spacing={2}
-                            >
-                              {/* <Avatar alt={name} src={avatarUrl} /> */}
-                              <Typography variant="subtitle2" noWrap>
-                                {name}
-                              </Typography>
-                            </Stack>
-                          </TableCell>
-                          <TableCell align="left">{email}</TableCell>
-                          <TableCell align="left">{address}</TableCell>
+                          <TableCell align="center">{id}</TableCell>
                           <TableCell align="center">
-                            {roles[0] === 'ROLE_ADMIN' ? 'Admin' : 'User'}
-                          </TableCell>
-                          <TableCell align="center">
-                            <Label
-                              variant="ghost"
-                              color={enabled ? 'success' : 'error'}
-                            >
-                              {sentenceCase(enabled ? 'Open' : 'Block')}
-                            </Label>
+                            <Typography variant="subtitle2" noWrap>
+                              {name}
+                            </Typography>
                           </TableCell>
 
-                          <TableCell align="right">
-                            <UserMoreMenu
-                              enabled={enabled}
-                              id={id}
-                              role={roles[0]}
+                          <TableCell align="center">{code}</TableCell>
+                          <TableCell align="center">{percent} %</TableCell>
+                          <TableCell align="center">
+                            <DeleteIcon
+                              sx={{ cursor: 'pointer', marginRight: '20px' }}
+                              onClick={() => handlDelete(id)}
+                            />
+                            <EditIcon
+                              sx={{ cursor: 'pointer' }}
+                              onClick={() => handleEdit(id)}
                             />
                           </TableCell>
                         </TableRow>
                       );
                     })}
-                  {emptyRows > 0 && (
+                  {/* {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
                     </TableRow>
-                  )}
+                  )} */}
                 </TableBody>
                 {isUserNotFound && (
                   <TableBody>

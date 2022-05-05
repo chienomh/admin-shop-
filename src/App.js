@@ -15,7 +15,6 @@ import { useEffect } from 'react';
 
 export default function App() {
   const dispatch = useDispatch();
-  dispatch(login());
 
   return (
     <ThemeConfig>

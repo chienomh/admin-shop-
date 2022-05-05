@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 // component
 import Iconify from '../../../components/Iconify';
+import { useNavigate } from 'react-router-dom';
 
 // ----------------------------------------------------------------------
 
@@ -47,6 +48,9 @@ export default function UserListToolbar({
   filterName,
   onFilterName,
 }) {
+  const navigate = useNavigate();
+  const path = window.location.pathname;
+
   return (
     <RootStyle
       sx={{
@@ -64,7 +68,11 @@ export default function UserListToolbar({
         <SearchStyle
           value={filterName}
           onChange={onFilterName}
-          placeholder="Search user..."
+          placeholder={
+            path === '/dashboard/coupon'
+              ? 'Search name coupon'
+              : 'Search user...'
+          }
           startAdornment={
             <InputAdornment position="start">
               <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />

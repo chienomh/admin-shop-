@@ -24,20 +24,20 @@ apiClient.interceptors.request.use(
 );
 
 // // Response interceptor
-// apiClient.interceptors.response.use(
-//   response => {
-//     return response;
-//   },
-//   error => {
-//     // Clear local storage data and redirect to login page if request is 401 - Unauthorized
-//     if (error.response.status === 401) {
-//       authService.removeAccessToken();
-//       authService.removeRefreshToken();
-//       window.location.href = '/login';
-//     }
+apiClient.interceptors.response.use(
+  response => {
+    return response;
+  },
+  error => {
+    // Clear local storage data and redirect to login page if request is 401 - Unauthorized
+    if (error.response.status === 401) {
+      localStorage.setItem('access_token', '');
+      window.location.href = '/login';
+      localStorage.setItem('dataUser', '');
+    }
 
-//     return Promise.reject(error);
-//   },
-// );
+    return Promise.reject(error);
+  },
+);
 
 export default apiClient;

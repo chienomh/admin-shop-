@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 // material
 import {
   Menu,
@@ -12,7 +14,7 @@ import {
 } from '@mui/material';
 // component
 import Iconify from '../../../components/Iconify';
-import { banUser } from 'src/services/userAPI';
+import { banUser, ChangeRole } from 'src/services/userAPI';
 
 // ----------------------------------------------------------------------
 
@@ -46,6 +48,16 @@ export default function UserMoreMenu(props) {
       window.location.reload();
     })();
   };
+
+  const handleChangeUser = async () => {
+    const params = {
+      roleEnum: props.role === 'ROLE_ADMIN' ? 2 : 1,
+      userId: props.id,
+    };
+
+    await ChangeRole(params);
+    window.location.reload();
+  };
   return (
     <>
       <IconButton ref={ref} onClick={() => setIsOpen(true)}>
@@ -57,7 +69,7 @@ export default function UserMoreMenu(props) {
         anchorEl={ref.current}
         onClose={() => setIsOpen(false)}
         PaperProps={{
-          sx: { width: 200, maxWidth: '100%' },
+          sx: { width: 250, maxWidth: '100%' },
         }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -88,6 +100,28 @@ export default function UserMoreMenu(props) {
           </ListItemIcon>
           <ListItemText
             primary="Block"
+            primaryTypographyProps={{ variant: 'body2' }}
+          />
+        </MenuItem>
+        <MenuItem
+          component={RouterLink}
+          to="#"
+          sx={{ color: 'text.secondary' }}
+          onClick={handleChangeUser}
+        >
+          <ListItemIcon>
+            {props.role === 'ROLE_ADMIN' ? (
+              <ArrowDownwardIcon />
+            ) : (
+              <ArrowUpwardIcon />
+            )}
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              props.role === 'ROLE_ADMIN'
+                ? 'Back as user'
+                : 'Become an administrator'
+            }
             primaryTypographyProps={{ variant: 'body2' }}
           />
         </MenuItem>

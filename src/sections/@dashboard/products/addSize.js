@@ -9,7 +9,7 @@ export default function AddSize(props) {
 
   const handleChangeSize = e => {
     setSize(e.target.value);
-    const data = { ...props.data, size: e.target.value };
+    const data = { ...props.data, name: e.target.value };
     props.setData(data);
     const list = props.listdata.map((x, index) => {
       if (index === props.id) {
