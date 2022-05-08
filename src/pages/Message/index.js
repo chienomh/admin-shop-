@@ -45,6 +45,7 @@ const TABLE_HEAD = [
   { id: 'subject', label: 'Subject', alignRight: false },
   { id: 'message', label: 'Message', alignRight: false },
   { id: 'date', label: 'Date', alignRight: false },
+  { id: 'Res', label: 'Response', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
   { id: '' },
 ];
@@ -157,6 +158,8 @@ export default function MessagePage() {
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+
+  console.log(listBill);
 
   const filteredUsers = applySortFilter(
     listBill,
@@ -306,6 +309,7 @@ export default function MessagePage() {
                         subject,
                         createdAt,
                         message,
+                        response,
                       } = row;
                       const isItemSelected = selected.indexOf(firstName) !== -1;
 
@@ -325,6 +329,9 @@ export default function MessagePage() {
                           <TableCell align="center">{message}</TableCell>
                           <TableCell align="center">
                             {createdAt.slice(0, 10)}
+                          </TableCell>
+                          <TableCell align="center">
+                            {response ? 'Answered' : 'Reply'}
                           </TableCell>
                           <TableCell align="center">
                             <DeleteIcon

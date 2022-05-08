@@ -27,7 +27,7 @@ const MENU_OPTIONS = [
     linkTo: '/',
   },
   {
-    label: 'Profile',
+    label: 'Edit Profile',
     icon: 'eva:person-fill',
     linkTo: '/profile',
   },
@@ -49,7 +49,7 @@ export default function AccountPopover() {
   useEffect(() => {
     if (localStorage.getItem('dataUser')) {
       setUser(JSON.parse(localStorage?.getItem('dataUser') || ''));
-    }
+    } else navigate('/login', { replace: true });
   }, [localStorage.getItem('dataUser')]);
 
   // const user = JSON.parse(localStorage?.getItem('dataUser') || '');
