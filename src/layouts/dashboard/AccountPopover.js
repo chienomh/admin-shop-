@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // material
 import { alpha } from '@mui/material/styles';
@@ -44,8 +44,15 @@ export default function AccountPopover() {
   const navigate = useNavigate();
   // const user = useSelector(state => state.user).data;
   const data = useSelector(state => state);
+  const [user, setUser] = useState();
 
-  const user = JSON.parse(localStorage.getItem('dataUser') || '');
+  useEffect(() => {
+    if (localStorage.getItem('dataUser')) {
+      setUser(JSON.parse(localStorage?.getItem('dataUser') || ''));
+    }
+  }, [localStorage.getItem('dataUser')]);
+
+  // const user = JSON.parse(localStorage?.getItem('dataUser') || '');
 
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -87,56 +94,57 @@ export default function AccountPopover() {
       >
         <Avatar src={account.photoURL} alt="photoURL" />
       </IconButton>
+      {user && (
+        <MenuPopover
+          open={open}
+          onClose={handleClose}
+          anchorEl={anchorRef.current}
+          sx={{ width: 220 }}
+        >
+          <Box sx={{ my: 1.5, px: 2.5 }}>
+            <Typography variant="subtitle1" noWrap>
+              {user.user_name}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+              {user.email}
+            </Typography>
+          </Box>
 
-      <MenuPopover
-        open={open}
-        onClose={handleClose}
-        anchorEl={anchorRef.current}
-        sx={{ width: 220 }}
-      >
-        <Box sx={{ my: 1.5, px: 2.5 }}>
-          <Typography variant="subtitle1" noWrap>
-            {user.user_name}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {user.email}
-          </Typography>
-        </Box>
+          <Divider sx={{ my: 1 }} />
 
-        <Divider sx={{ my: 1 }} />
+          {MENU_OPTIONS.map(option => (
+            <MenuItem
+              key={option.label}
+              to={option.linkTo}
+              component={RouterLink}
+              onClick={handleClickOption}
+              sx={{ typography: 'body2', py: 1, px: 2.5 }}
+            >
+              <Iconify
+                icon={option.icon}
+                sx={{
+                  mr: 2,
+                  width: 24,
+                  height: 24,
+                }}
+              />
 
-        {MENU_OPTIONS.map(option => (
-          <MenuItem
-            key={option.label}
-            to={option.linkTo}
-            component={RouterLink}
-            onClick={handleClickOption}
-            sx={{ typography: 'body2', py: 1, px: 2.5 }}
-          >
-            <Iconify
-              icon={option.icon}
-              sx={{
-                mr: 2,
-                width: 24,
-                height: 24,
-              }}
-            />
+              {option.label}
+            </MenuItem>
+          ))}
 
-            {option.label}
-          </MenuItem>
-        ))}
-
-        <Box sx={{ p: 2, pt: 1.5 }}>
-          <Button
-            fullWidth
-            color="inherit"
-            variant="outlined"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </Box>
-      </MenuPopover>
+          <Box sx={{ p: 2, pt: 1.5 }}>
+            <Button
+              fullWidth
+              color="inherit"
+              variant="outlined"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </Box>
+        </MenuPopover>
+      )}
     </>
   );
 }

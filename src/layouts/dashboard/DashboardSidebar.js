@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
@@ -55,7 +55,13 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
 
   const isDesktop = useResponsive('up', 'lg');
 
-  const user = JSON.parse(localStorage.getItem('dataUser') || '');
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    if (localStorage.getItem('dataUser')) {
+      setUser(JSON.parse(localStorage?.getItem('dataUser') || ''));
+    }
+  }, [localStorage.getItem('dataUser')]);
 
   useEffect(() => {
     if (isOpenSidebar) {
@@ -76,22 +82,23 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
       }}
     >
       <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}></Box>
-
-      <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none" component={RouterLink} to="#">
-          <AccountStyle>
-            <Avatar src={account.photoURL} alt="photoURL" />
-            <Box sx={{ ml: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {user.user_name}
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
-              </Typography>
-            </Box>
-          </AccountStyle>
-        </Link>
-      </Box>
+      {user && (
+        <Box sx={{ mb: 5, mx: 2.5 }}>
+          <Link underline="none" component={RouterLink} to="#">
+            <AccountStyle>
+              <Avatar src={account.photoURL} alt="photoURL" />
+              <Box sx={{ ml: 2 }}>
+                <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
+                  {user.user_name}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  {account.role}
+                </Typography>
+              </Box>
+            </AccountStyle>
+          </Link>
+        </Box>
+      )}
 
       <NavSection navConfig={sidebarConfig} />
       <Box sx={{ flexGrow: 1 }} />
