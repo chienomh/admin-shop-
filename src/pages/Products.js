@@ -113,8 +113,6 @@ export default function EcommerceShop() {
         technology: technology,
       };
 
-      console.log(params);
-
       await AddProduct(params);
       setOpenAlertAdd(true);
     },
@@ -180,7 +178,10 @@ export default function EcommerceShop() {
         isOpen={openAlertAdd}
         textAlert="Add product successfully!"
         type="success"
-        onClose={() => setOpenAlertAdd(false)}
+        onClose={() => {
+          setOpenAlertAdd(false);
+          window.location.reload();
+        }}
         handle={() => setOpenPopup(false)}
       />
       <Dialog open={openPopup} onClose={handleClosePopup} maxWidth="lg">
