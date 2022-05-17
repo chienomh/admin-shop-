@@ -11,6 +11,54 @@ import {
   AppWeeklySales,
 } from '../sections/@dashboard/app';
 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+// import faker from 'faker';
+
+const faker = [12, 100, 223, 123, 500, 323, 123, 123];
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+);
+
+export const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    title: {
+      display: true,
+      text: '(Gross) Revenue',
+    },
+  },
+};
+
+const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+
+export const data = {
+  labels,
+  datasets: [
+    {
+      label: '$',
+      data: faker.map(e => e),
+      backgroundColor: 'rgba(53, 162, 235, 0.5)',
+    },
+  ],
+};
 // ----------------------------------------------------------------------
 
 export default function DashboardApp() {
@@ -45,6 +93,9 @@ export default function DashboardApp() {
             </Grid>
           </Grid>
         )}
+        <Box>
+          <Bar options={options} data={data} />;
+        </Box>
       </Container>
     </Page>
   );
