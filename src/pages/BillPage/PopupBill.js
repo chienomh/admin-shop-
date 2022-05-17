@@ -8,11 +8,16 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box } from '@mui/system';
-import { changeStatusAPI, getDetailBill } from 'src/services/bill';
+import {
+  addShipperAPI,
+  changeStatusAPI,
+  getDetailBill,
+} from 'src/services/bill';
 import moment from 'moment';
 import AlertShop from 'src/components/Alert';
 
@@ -47,6 +52,16 @@ export default function PopupBill(props) {
   const [openAlert, setOpenAlert] = useState(false);
   const [type, setType] = useState(false);
 
+  const [st, setSt] = useState(0);
+
+  const [nameShip, setNameShip] = useState('');
+  const [phoneShip, setPhoneShip] = useState('');
+
+  const [openAddShip, setOpenAddShip] = useState(false);
+
+  const [openCancel, setOpenCancel] = useState(false);
+  const [reasonCancel, setReasonCancel] = useState('');
+
   const handleClosePopup = () => {
     handleClose();
   };
@@ -59,9 +74,23 @@ export default function PopupBill(props) {
   }, [id, openAlert]);
 
   const handleChangeStatus = status => {
+    setSt(status);
+    if (status === 2) {
+      handleChangeDelivering(status);
+    } else if (status === 4) {
+      handleChangeCancel(status);
+    } else {
+      handleChangeStatus2(status);
+    }
+  };
+
+  const handleChangeStatus2 = status => {
     const params = {
       idBill: dataBill.id,
-      status: status,
+      data: {
+        billStatus: status,
+        reasonCancel: '',
+      },
     };
     (async () => {
       try {
@@ -74,8 +103,139 @@ export default function PopupBill(props) {
       }
     })();
   };
+
+  const handleChangeDelivering = () => {
+    setOpenAddShip(true);
+  };
+
+  const handleChangeCancel = () => {
+    setOpenCancel(true);
+  };
+
+  const handlCloseAddShip = () => {
+    setOpenAddShip(false);
+  };
+
+  const onAddShip = () => {
+    const params = {
+      idBill: dataBill.id,
+      data: {
+        billStatus: st,
+        reasonCancel: '',
+      },
+    };
+
+    const paramsShip = {
+      data: {
+        shipperName: nameShip,
+        shipperPhone: phoneShip,
+      },
+      id: dataBill.id,
+    };
+    (async () => {
+      try {
+        await addShipperAPI(paramsShip);
+      } catch (error) {
+        setOpenAlert(true);
+        setType(false);
+      }
+    })();
+
+    (async () => {
+      try {
+        await changeStatusAPI(params);
+        setOpenAlert(true);
+        setType(true);
+      } catch (error) {
+        setOpenAlert(true);
+        setType(false);
+      }
+    })();
+    setOpenAddShip(false);
+  };
+
+  const handlCloseCancel = () => {
+    setOpenCancel(false);
+  };
+
+  const onCancel = () => {
+    const params = {
+      idBill: dataBill.id,
+      data: {
+        billStatus: st,
+        reasonCancel: reasonCancel,
+      },
+    };
+
+    (async () => {
+      try {
+        await changeStatusAPI(params);
+        setOpenAlert(true);
+        setType(true);
+      } catch (error) {
+        setOpenAlert(true);
+        setType(false);
+      }
+    })();
+    setOpenCancel(false);
+  };
   return (
     <Dialog open={open} onClose={handleClosePopup} maxWidth="lg">
+      <Dialog open={openAddShip} onClose={handlCloseAddShip}>
+        <Box padding="20px">
+          <Box
+            fontSize="23px"
+            fontWeight="600"
+            paddingBottom="10px"
+            minWidth="500px"
+          >
+            Enter the shipper's information
+          </Box>
+          <Box margin="20px">
+            <label>Name</label>
+            <TextField
+              sx={{ width: '100%' }}
+              onChange={e => setNameShip(e.target.value)}
+            />
+          </Box>
+          <Box margin="20px">
+            <label>Phone</label>
+            <TextField
+              sx={{ width: '100%' }}
+              onChange={e => setPhoneShip(e.target.value)}
+            />
+          </Box>
+          <Box margin="20px">
+            <Button fullWidth variant="contained" onClick={onAddShip}>
+              OK
+            </Button>
+          </Box>
+        </Box>
+      </Dialog>
+
+      <Dialog open={openCancel} onClose={handlCloseCancel}>
+        <Box padding="20px">
+          <Box
+            fontSize="23px"
+            fontWeight="600"
+            paddingBottom="10px"
+            minWidth="500px"
+          >
+            Reason
+          </Box>
+          <TextField
+            label="Reason"
+            sx={{ width: '100%' }}
+            onChange={e => setReasonCancel(e.target.value)}
+          />
+          <Box marginTop="20px">
+            <Button fullWidth variant="contained" onClick={onCancel}>
+              OK
+            </Button>
+          </Box>
+        </Box>
+      </Dialog>
+
       <AlertShop
         isOpen={openAlert}
         textAlert={
@@ -147,6 +307,22 @@ export default function PopupBill(props) {
                     valuesStatus.filter(x => x.value === dataBill.status)[0]
                       .label
                   }{' '}
+                </Grid>
+              </Grid>
+              <Grid item xs={6} container>
+                <Grid item xs={6} sx={{ fontWeight: 600 }}>
+                  Shipper:
+                </Grid>
+                <Grid item xs={6}>
+                  {dataBill.shipperName}
+                </Grid>
+              </Grid>
+              <Grid item xs={6} container>
+                <Grid item xs={6} sx={{ fontWeight: 600 }}>
+                  Phone Shipper:
+                </Grid>
+                <Grid item xs={6}>
+                  {dataBill.shipperPhone}
                 </Grid>
               </Grid>
               <Grid item xs={12} container>
