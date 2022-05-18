@@ -15,3 +15,6 @@ export const changeStatusAPI = params => {
 export const addShipperAPI = params => {
   return apiClient.put(`/admin/bill/update-shipper/${params.id}`, params.data);
 };
+
+export const GetRevenue = params =>
+  apiClient.get(`/admin/dashboard/body?month=${params}&sort=0&year=2022`);
