@@ -2,6 +2,7 @@
 import { Box, Container, Grid, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { getInforDashboard } from 'src/services/loginAPI';
+import moment from 'moment';
 // components
 import Page from '../components/Page';
 import {
@@ -21,9 +22,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { GetRevenue } from 'src/services/bill';
 // import faker from 'faker';
-
-const faker = [12, 100, 223, 123, 500, 323, 123, 123];
 
 ChartJS.register(
   CategoryScale,
@@ -49,20 +49,38 @@ export const options = {
 
 const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
 
-export const data = {
-  labels,
-  datasets: [
-    {
-      label: '$',
-      data: faker.map(e => e),
-      backgroundColor: 'rgba(53, 162, 235, 0.5)',
-    },
-  ],
-};
 // ----------------------------------------------------------------------
 
 export default function DashboardApp() {
   const [dataDashboard, setDataDashboard] = useState();
+
+  const month = moment(new Date()).format('MM');
+  console.log(Number(month));
+
+  const [faker, setFaker] = useState([]);
+
+  for (let i = 1; i <= month; i++) {
+    (async () => {
+      const data = await GetRevenue(i);
+      faker.push(data.data.totalPrice);
+    })();
+  }
+
+  console.log(faker);
+
+  let dataRevenue = [];
+  console.log(faker);
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: '$',
+        data: faker.map(e => e),
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      },
+    ],
+  };
 
   useEffect(() => {
     (async () => {
