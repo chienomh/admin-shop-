@@ -45,7 +45,6 @@ const TABLE_HEAD = [
   { id: 'subject', label: 'Subject', alignRight: false },
   { id: 'message', label: 'Message', alignRight: false },
   { id: 'date', label: 'Date', alignRight: false },
-  { id: 'Res', label: 'Response', alignRight: false },
   { id: 'action', label: 'Action', alignRight: false },
   { id: '' },
 ];
@@ -229,7 +228,7 @@ export default function MessagePage() {
         }}
       />
       <Dialog open={openPopupMess} onClose={handleCloseMess}>
-        <Box width="600px" minHeight="300px" padding="50px 20px">
+        <Box width="600px" padding="20px 20px">
           <CloseIcon
             sx={{
               cursor: 'pointer',
@@ -239,33 +238,35 @@ export default function MessagePage() {
             }}
             onClick={handleCloseMess}
           />
-          <FormikProvider value={formik}>
-            <Form>
-              <TextField
-                fullWidth
-                label="Message"
-                {...getFieldProps('mess')}
-                error={Boolean(touched.mess && errors.mess)}
-                helperText={touched.mess && errors.mess}
-                value={mess}
-                onChange={handlChangeMess}
-                multiline
-                sx={{ '>div': { height: '200px' } }}
-              />
-              <Box>
-                <LoadingButton
-                  fullWidth
-                  size="large"
-                  type="submit"
-                  variant="contained"
-                  loading={isSubmitting}
-                  sx={{ marginTop: '20px' }}
-                >
-                  Send
-                </LoadingButton>
+          <Box fontSize="25px" fontWeight="700">
+            Detail Message
+          </Box>
+          <Box margin="20px">
+            <Box display="flex">
+              <Box fontWeight="bold" width="100px">
+                Name:
               </Box>
-            </Form>
-          </FormikProvider>
+              <Box>{id.lastName}</Box>
+            </Box>
+            <Box display="flex">
+              <Box fontWeight="bold" width="100px">
+                Subject:
+              </Box>
+              <Box>{id.subject}</Box>
+            </Box>
+            <Box display="flex">
+              <Box fontWeight="bold" width="100px">
+                Message:
+              </Box>
+              <Box>{id.message}</Box>
+            </Box>
+            <Box display="flex">
+              <Box fontWeight="bold" width="100px">
+                Create at:
+              </Box>
+              <Box>{id.createdAt ? id.createdAt.slice(0, 10) : ''}</Box>
+            </Box>
+          </Box>
         </Box>
       </Dialog>
       <Container>
@@ -331,16 +332,13 @@ export default function MessagePage() {
                             {createdAt.slice(0, 10)}
                           </TableCell>
                           <TableCell align="center">
-                            {response ? 'Answered' : 'Reply'}
-                          </TableCell>
-                          <TableCell align="center">
                             <DeleteIcon
                               sx={{ cursor: 'pointer', marginRight: '20px' }}
                               onClick={() => handlDelete(id)}
                             />
                             <SendIcon
                               sx={{ cursor: 'pointer' }}
-                              onClick={() => handleOpenPopupSend(id)}
+                              onClick={() => handleOpenPopupSend(row)}
                             />
                           </TableCell>
                         </TableRow>
