@@ -55,21 +55,19 @@ export default function DashboardApp() {
   const [dataDashboard, setDataDashboard] = useState();
 
   const month = moment(new Date()).format('MM');
-  console.log(Number(month));
 
   const [faker, setFaker] = useState([]);
 
-  for (let i = 1; i <= month; i++) {
-    (async () => {
-      const data = await GetRevenue(i);
-      faker.push(data.data.totalPrice);
-    })();
-  }
-
-  console.log(faker);
-
-  let dataRevenue = [];
-  console.log(faker);
+  const [revenue, setRevenue] = useState({
+    labels,
+    datasets: [
+      {
+        label: '$',
+        data: 1,
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      },
+    ],
+  });
 
   const data = {
     labels,
@@ -82,7 +80,27 @@ export default function DashboardApp() {
     ],
   };
 
+  let x = [];
+
   useEffect(() => {
+    (async () => {
+      for (let i = 1; i <= Number(month); i++) {
+        const data = await GetRevenue(i);
+        x.push(data.data.totalPrice);
+        setFaker(x);
+
+        setRevenue({
+          labels,
+          datasets: [
+            {
+              label: '$',
+              data: x.map(e => e),
+              backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            },
+          ],
+        });
+      }
+    })();
     (async () => {
       const data = await getInforDashboard();
       setDataDashboard(data.data);
@@ -112,7 +130,7 @@ export default function DashboardApp() {
           </Grid>
         )}
         <Box>
-          <Bar options={options} data={data} />;
+          <Bar options={options} data={revenue} />
         </Box>
       </Container>
     </Page>

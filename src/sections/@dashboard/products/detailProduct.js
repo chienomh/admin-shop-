@@ -240,11 +240,29 @@ export default function DetailProduct() {
                   <Box sx={{ fontSize: '16px' }}>Size: </Box>
                 </Grid>
                 <Grid item xs={8}>
-                  <Box>
+                  <Box flexWrap="wrap">
                     {product.listSize.map((x, index) => (
-                      <Button variant="contained">{x.name}</Button>
+                      <Button variant="contained" sx={{ marginRight: '20px' }}>
+                        {x.name}
+                      </Button>
                     ))}
                   </Box>
+                </Grid>
+              </Grid>
+              <Grid
+                container
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '50px',
+                  borderBottom: '1px solid #bbb',
+                }}
+              >
+                <Grid item xs={4}>
+                  <Box sx={{ fontSize: '16px' }}>Quantiry: </Box>
+                </Grid>
+                <Grid item xs={8}>
+                  <Box>{product.total_quantity}</Box>
                 </Grid>
               </Grid>
             </Grid>
